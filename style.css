@@ -1,0 +1,60 @@
+* {
+  margin: 0px;
+  box-sizing: border-box;
+}
+
+.banner {
+  background-color: #ed1d24;
+  color: white;
+  line-height: 51px;
+  display: block;
+  padding: 0px;
+  margin: 0px;
+}
+
+.logo {
+  display: inline-block;
+  position: absolute;
+  width: 10%;
+}
+
+.navbar {
+  margin: 0px;
+  list-style: none;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+a {
+  padding: 16px 30px;
+  text-decoration: none;
+  color: white;
+}
+
+.searchButtons {
+  margin-top: 125px;
+  display: flex;
+  justify-content: center;
+}
+
+button {
+  width: 250px;
+  height: 250px;
+  margin: 0 10px;
+  border-radius: 8px;
+  font-size: 24px;
+  background-color: rgb(192, 192, 192);
+}
+
+button:hover {
+  cursor: pointer;
+}
+
+footer {
+  display: block;
+  height: 51px;
+  background-color: #ed1d24;
+  margin-top: 125px;
+  margin-bottom: 0px;
+}
