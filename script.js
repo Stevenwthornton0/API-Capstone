@@ -205,11 +205,14 @@ const MD5 = function (string) {
 
 const myHash = MD5("1e075ff8e9813a3e50aeb7575a6c0d3c34345746b99939f8fe9c2afc890d37e351204ef93");
 
+let currentPage = 1
+
 const params = {
   apikey: myApiKey,
   hash: myHash,
   ts: 1, 
-  limit: 100
+  limit: 15,
+  offset: (currentPage - 1) * 20
 }
 
 function formatUrlString(params) {
@@ -226,22 +229,54 @@ function getURL(search, endpoint, name) {
   return url;
 }
 
-function displayResults(responseJSON) {
+function createPagination(numberOfPages) {
+  for (let i = 1; i <= numberOfPages; i++) {
+    console.log(i);
+    $('.page-nav').append(`
+    <div class="page-item" data-page="${i}">${i}</div>
+    `)
+  }
+}
+
+function displayResults(responseJSON, ref) {
   console.log(responseJSON);
+  $('.page-nav').empty();
   $('.pics').empty();
+  let numberOfPages = Math.ceil(responseJSON.data.total / 20);
+  createPagination(numberOfPages)
   for (let i = 0; i < responseJSON.data.results.length; i++) {
     $(".pics").append(`
-    <li class="items">
-      <a href="results.html">
-        <img src="${responseJSON.data.results[i].thumbnail.path}/portrait_large.jpg">
-        <p>${responseJSON.data.results[i].name}</p>
+    <div class="content-wrapper">
+        <div class="img-frame">
+          <a href="results.html?name=${encodeURIComponent(responseJSON.data.results[i].name)}">
+            <img src="${responseJSON.data.results[i].thumbnail.path}/portrait_large.${responseJSON.data.results[i].thumbnail.extension}">
+          </a>
+        </div>
       </a>
-    </li>`);
+      <div class="name-body">
+        <div class="name-body-wrapper">
+          <a class="character-link" href="results.html?name=${encodeURIComponent(responseJSON.data.results[i].name)}">
+            <p class="character-name">${responseJSON.data.results[i].name}
+            </p>
+          </a>
+        </div>
+      </div>
+    `)
   }
+  console.log(currentPage);
+  $('.page-item').on('click', function() {
+    let newPage = $(this).data('page');
+    if (newPage != currentPage) {
+      currentPage = newPage;
+    }
+    console.log(currentPage);
+    getEventId(ref);
+  })
 }
 
 function getResultsName(endpoint, name) {
   let url = getURL("name", endpoint, name);
+  $('.pics').empty();
 
   fetch(url)
     .then(response => {
@@ -256,7 +291,7 @@ function getResultsName(endpoint, name) {
     })
 }
 
-function getResults(search, id) {
+function getResults(search, id, ref) {
   const eventId = id.toString();
   let endpoint = "/v1/public/characters";
   let url = getURL(search, endpoint, eventId);
@@ -264,11 +299,15 @@ function getResults(search, id) {
 
   fetch(url)
     .then(response => response.json())
-    .then(responseJSON => displayResults(responseJSON))
+    .then(responseJSON => displayResults(responseJSON, ref))
 };
 
-function getResultsId(q, search, endpoint, x) {
-  let url = getURL(q, endpoint, x)
+function getEventId(ref) {
+  let q = 'name';
+  let search = 'events';
+  let endpoint = "/v1/public/events";
+  let url = getURL(q, endpoint, ref)
+  $('.errorMessage').empty();
   console.log(url);
 
   fetch(url)
@@ -278,7 +317,27 @@ function getResultsId(q, search, endpoint, x) {
       }
       throw new Error(response.statusText)
     })
-    .then(responseJSON => getResults(search, responseJSON.data.results[0].id))
+    .then(responseJSON => getResults(search, responseJSON.data.results[0].id, ref))
+    .catch(err => {
+      $('.errorMessage').text(`Something went wrong: ${err.message}`)
+    })
+}
+
+function getComicId(ref) {
+let q = 'title';
+  let search = 'comics';
+  let endpoint = "/v1/public/comics";
+  let url = getURL(q, search, endpoint, ref)
+  $('.errorMessage').empty();
+
+  fetch(url)
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error(response.statusText)
+    })
+    .then(responseJSON => getResults(search, responseJSON.data.results[0].id, ref))
     .catch(err => {
       $('.errorMessage').text(`Something went wrong: ${err.message}`)
     })
@@ -293,20 +352,15 @@ function watchForm() {
   })
   $('.byEvent').on("submit", event => {
     event.preventDefault();
-    let q = "name";
-    let search = "events";
-    let endpoint = "/v1/public/events";
     const events = $('.event').val();
-    getResultsId(q, search, endpoint, events);
+    getEventId(events);
   })
   $('.byComic').on("submit", event => {
     event.preventDefault();
-    let q = "title";
-    let search = "comics";
-    let endpoint = "/v1/public/comics";
     const comic = $('.comic').val();
-    getResultsId(q, search, endpoint, comic);
+    getComicId(comic);
   })
 }
 
 $(watchForm)
+
