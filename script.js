@@ -205,14 +205,10 @@ const MD5 = function (string) {
 
 const myHash = MD5("1e075ff8e9813a3e50aeb7575a6c0d3c34345746b99939f8fe9c2afc890d37e351204ef93");
 
-let currentPage = 1
-
 const params = {
   apikey: myApiKey,
   hash: myHash,
   ts: 1, 
-  limit: 15,
-  offset: (currentPage - 1) * 20
 }
 
 function formatUrlString(params) {
@@ -238,11 +234,11 @@ function createPagination(numberOfPages) {
   }
 }
 
-function displayResults(responseJSON, ref) {
+function displayResults(responseJSON, search, id) {
   console.log(responseJSON);
   $('.page-nav').empty();
   $('.pics').empty();
-  let numberOfPages = Math.ceil(responseJSON.data.total / 20);
+  let numberOfPages = Math.ceil(responseJSON.data.total / 10);
   createPagination(numberOfPages)
   for (let i = 0; i < responseJSON.data.results.length; i++) {
     $(".pics").append(`
@@ -263,14 +259,9 @@ function displayResults(responseJSON, ref) {
       </div>
     `)
   }
-  console.log(currentPage);
   $('.page-item').on('click', function() {
-    let newPage = $(this).data('page');
-    if (newPage != currentPage) {
-      currentPage = newPage;
-    }
-    console.log(currentPage);
-    getEventId(ref);
+    let currentPage = $(this).data('page')
+    getResults(search, id, currentPage)
   })
 }
 
@@ -291,15 +282,20 @@ function getResultsName(endpoint, name) {
     })
 }
 
-function getResults(search, id, ref) {
+function getOffset(page) {
+  let offset = (page - 1) * 10
+  return offset;
+}
+
+function getResults(search, id, currentPage) {
   const eventId = id.toString();
   let endpoint = "/v1/public/characters";
   let url = getURL(search, endpoint, eventId);
   console.log(url)
 
-  fetch(url)
+  fetch(`${url}&limit=10&offset=${getOffset(currentPage)}`)
     .then(response => response.json())
-    .then(responseJSON => displayResults(responseJSON, ref))
+    .then(responseJSON => displayResults(responseJSON, search, id))
 };
 
 function getEventId(ref) {
@@ -317,17 +313,18 @@ function getEventId(ref) {
       }
       throw new Error(response.statusText)
     })
-    .then(responseJSON => getResults(search, responseJSON.data.results[0].id, ref))
+    .then(responseJSON => getResults(search, responseJSON.data.results[0].id, 1))
     .catch(err => {
       $('.errorMessage').text(`Something went wrong: ${err.message}`)
     })
 }
 
 function getComicId(ref) {
-let q = 'title';
+  let q = 'title';
   let search = 'comics';
   let endpoint = "/v1/public/comics";
-  let url = getURL(q, search, endpoint, ref)
+  let url = getURL(q, endpoint, ref)
+  console.log(url);
   $('.errorMessage').empty();
 
   fetch(url)
@@ -337,7 +334,7 @@ let q = 'title';
       }
       throw new Error(response.statusText)
     })
-    .then(responseJSON => getResults(search, responseJSON.data.results[0].id, ref))
+    .then(responseJSON => getResults(search, responseJSON.data.results[0].id, 1))
     .catch(err => {
       $('.errorMessage').text(`Something went wrong: ${err.message}`)
     })
