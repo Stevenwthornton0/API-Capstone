@@ -205,6 +205,8 @@ const MD5 = function (string) {
 
 const myHash = MD5("1e075ff8e9813a3e50aeb7575a6c0d3c34345746b99939f8fe9c2afc890d37e351204ef93");
 
+let currentPage = 1
+
 const params = {
   apikey: myApiKey,
   hash: myHash,
@@ -226,18 +228,21 @@ function getURL(search, endpoint, name) {
 }
 
 function createPagination(numberOfPages) {
+  $('.page-nav').append("<button class='prev'>Prev</button>")
   for (let i = 1; i <= numberOfPages; i++) {
     console.log(i);
     $('.page-nav').append(`
     <div class="page-item" data-page="${i}">${i}</div>
     `)
   }
+  $('.page-nav').append('<button class="next">Next</button>')
 }
 
 function displayResults(responseJSON, search, id) {
   console.log(responseJSON);
   $('.page-nav').empty();
   $('.pics').empty();
+  $('.loading-icon').addClass('hidden');
   let numberOfPages = Math.ceil(responseJSON.data.total / 10);
   createPagination(numberOfPages)
   for (let i = 0; i < responseJSON.data.results.length; i++) {
@@ -259,13 +264,48 @@ function displayResults(responseJSON, search, id) {
       </div>
     `)
   }
+
+  $('.resultsPage').html(`
+  <img class="hero-image" src="${responseJSON.data.results[0].thumbnail.path}/portrait_uncanny.${responseJSON.data.results[0].thumbnail.extension}">
+  <p class="character-description">${responseJSON.data.results[0].description}</p>
+  <a href="${responseJSON.data.results[0].urls[0].url}">Learn More</a>
+  <a href="${responseJSON.data.results[0].urls[2].url}">Comics</a>
+  `)
+
+
+  $('.prev').on('click', function() {
+    currentPage = currentPage - 1;
+    if (currentPage > 0) {
+      $('.pics').empty();
+      $('.loading-icon').removeClass('hidden');
+      getResults(search, id, currentPage);
+    } else {
+      currentPage++;
+    }
+  })
   $('.page-item').on('click', function() {
-    let currentPage = $(this).data('page')
-    getResults(search, id, currentPage)
+    let newPage = $(this).data('page')
+    if (newPage !== currentPage) {
+      $('.pics').empty();
+      $('.loading-icon').removeClass('hidden');
+      currentPage = newPage;
+      getResults(search, id, currentPage)
+    } 
+  })
+  $('.next').on('click', function() {
+    currentPage = currentPage + 1;
+    if (currentPage < numberOfPages) {
+      $('.pics').empty();
+      $('.loading-icon').removeClass('hidden');
+      getResults(search, id, currentPage)
+    } else {
+      currentPage--;
+    }
   })
 }
 
-function getResultsName(endpoint, name) {
+function getResultsName(name) {
+  let endpoint = "/v1/public/characters";
   let url = getURL("name", endpoint, name);
   $('.pics').empty();
 
@@ -343,13 +383,13 @@ function getComicId(ref) {
 function watchForm() {
   $('.byName').on("submit", event => {
     event.preventDefault();
-    let endpoint = "/v1/public/characters";
     const name = $('.name').val();
-    getResultsName(endpoint, name);
+    getResultsName(name);
   })
   $('.byEvent').on("submit", event => {
     event.preventDefault();
     const events = $('.event').val();
+    $('.loading-icon').removeClass('hidden');
     getEventId(events);
   })
   $('.byComic').on("submit", event => {
@@ -361,3 +401,9 @@ function watchForm() {
 
 $(watchForm)
 
+function characterResults() {
+  let foo = (window.location.href).split('?');
+  let search = (foo[1].split('='))[1];
+  getResultsName(search);
+
+}
