@@ -213,6 +213,10 @@ const params = {
   ts: 1, 
 }
 
+function boxFocus() {
+  $('.searchBox').focus();
+}
+
 function formatUrlString(params) {
   const queryItems = Object.keys(params)
     .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
@@ -240,14 +244,15 @@ function createPagination(numberOfPages) {
 
 function displayResults(responseJSON, search, id) {
   console.log(responseJSON);
+  // $('.loading-icon').removeClass('hidden')
+  console.log('did it')
   $('.page-nav').empty();
-  $('.pics').empty();
   $('.loading-icon').addClass('hidden');
   let numberOfPages = Math.ceil(responseJSON.data.total / 10);
   createPagination(numberOfPages)
   for (let i = 0; i < responseJSON.data.results.length; i++) {
     $(".pics").append(`
-    <div class="content-wrapper">
+    <li class="content-wrapper">
         <div class="img-frame">
           <a href="results.html?name=${encodeURIComponent(responseJSON.data.results[i].name)}">
             <img src="${responseJSON.data.results[i].thumbnail.path}/portrait_large.${responseJSON.data.results[i].thumbnail.extension}">
@@ -261,7 +266,7 @@ function displayResults(responseJSON, search, id) {
             </p>
           </a>
         </div>
-      </div>
+      </li>
     `)
   }
 
@@ -294,7 +299,7 @@ function displayResults(responseJSON, search, id) {
   })
   $('.next').on('click', function() {
     currentPage = currentPage + 1;
-    if (currentPage < numberOfPages) {
+    if (currentPage <= numberOfPages) {
       $('.pics').empty();
       $('.loading-icon').removeClass('hidden');
       getResults(search, id, currentPage)
@@ -308,6 +313,7 @@ function getResultsName(name) {
   let endpoint = "/v1/public/characters";
   let url = getURL("name", endpoint, name);
   $('.pics').empty();
+  console.log(url);
 
   fetch(url)
     .then(response => {
@@ -319,6 +325,7 @@ function getResultsName(name) {
     .then(responseJSON => displayResults(responseJSON))
     .catch(err => {
       $('.errorMessage').text(`Something went wrong: ${err.message}`)
+      $('.loading-icon').addClass('hidden')
     })
 }
 
@@ -328,6 +335,7 @@ function getOffset(page) {
 }
 
 function getResults(search, id, currentPage) {
+  // $('.loading-icon').removeClass('hidden')
   const eventId = id.toString();
   let endpoint = "/v1/public/characters";
   let url = getURL(search, endpoint, eventId);
@@ -355,8 +363,10 @@ function getEventId(ref) {
     })
     .then(responseJSON => getResults(search, responseJSON.data.results[0].id, 1))
     .catch(err => {
-      $('.errorMessage').text(`Something went wrong: ${err.message}`)
+      $('.errorMessage').text(`Something went wrong: ${ref} not found!`)
+      $('.loading-icon').addClass('hidden')
     })
+
 }
 
 function getComicId(ref) {
@@ -377,23 +387,34 @@ function getComicId(ref) {
     .then(responseJSON => getResults(search, responseJSON.data.results[0].id, 1))
     .catch(err => {
       $('.errorMessage').text(`Something went wrong: ${err.message}`)
+      $('.loading-icon').addClass('hidden')
     })
+  
+  
 }
 
 function watchForm() {
   $('.byName').on("submit", event => {
     event.preventDefault();
+    $('.loading-icon').removeClass('hidden')
+    $('.pics').empty();
+    $('.page-nav').empty();
     const name = $('.name').val();
     getResultsName(name);
   })
   $('.byEvent').on("submit", event => {
     event.preventDefault();
+    $('.loading-icon').removeClass('hidden')
+    $('.pics').empty();
+    $('.page-nav').empty();
     const events = $('.event').val();
-    $('.loading-icon').removeClass('hidden');
     getEventId(events);
   })
   $('.byComic').on("submit", event => {
     event.preventDefault();
+    $('.loading-icon').removeClass('hidden')
+    $('.pics').empty();
+    $('.page-nav').empty();
     const comic = $('.comic').val();
     getComicId(comic);
   })

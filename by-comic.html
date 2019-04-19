@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width">
     <title>Marvel Character Search</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css?family=Libre+Franklin:100i,200,300,400,500,700,900" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
   </head>
 
-  <body>
+  <body class="pages" onload="boxFocus()">
     <header class="banner">
       <a href="index.html"><img src="./Images/marvellogo.jpg" alt="Marvel Logo" class="logo"></a>
       <ul class="navbar">
@@ -18,24 +19,43 @@
       </ul>
     </header>
 
-    <section class="search byComic">
-      <form>
-        <input class="comic" type="text" placeholder="Avengers: The Initiative">
-        <input type="submit" value="Search">
-      </form>
-    </section>
+    <main class="main-content">
 
-    <p class="errorMessage"></p>
+      <section class="search byComic">
+        <form class="search-line">
+          <input class="searchBox comic" type="text" placeholder="Avengers: The Initiative">
+          <input class="submit" type="submit" value="">
+        </form>
+      </section>
 
-    <section class="results">
-      <ul class="pics">
+      <section class="loading-icon hidden">
+          <svg version="1.1" id="loader-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+          width="40px" height="40px" viewBox="0 0 50 50" style="enable-background:new 0 0 50 50;" xml:space="preserve">
+            <path fill="#000" d="M25.251,6.461c-10.318,0-18.683,8.365-18.683,18.683h4.068c0-8.071,6.543-14.615,14.615-14.615V6.461z">
+            <animateTransform attributeType="xml"
+            attributeName="transform"
+            type="rotate"
+            from="0 25 25"
+            to="360 25 25"
+            dur="0.6s"
+            repeatCount="indefinite"/>
+            </path>
+          </svg>
+        </section>
 
-      </ul>
-    </section>
+      <p class="errorMessage"></p>
 
-    <section class="page-nav">
-      
-    </section>
+      <section class="results">
+        <ul class="pics">
+
+        </ul>
+      </section>
+
+      <section class="page-nav">
+        
+      </section>
+
+    </main>
 
     <footer>
       
