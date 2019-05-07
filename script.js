@@ -234,7 +234,6 @@ function getURL(search, endpoint, name) {
 function createPagination(numberOfPages) {
   $('.page-nav').append("<button class='prev'>Prev</button>")
   for (let i = 1; i <= numberOfPages; i++) {
-    console.log(i);
     $('.page-nav').append(`
     <div class="page-item" data-page="${i}">${i}</div>
     `)
@@ -243,9 +242,6 @@ function createPagination(numberOfPages) {
 }
 
 function displayResults(responseJSON, search, id) {
-  console.log(responseJSON);
-  // $('.loading-icon').removeClass('hidden')
-  console.log('did it')
   $('.page-nav').empty();
   $('.loading-icon').addClass('hidden');
   let numberOfPages = Math.ceil(responseJSON.data.total / 10);
@@ -272,9 +268,13 @@ function displayResults(responseJSON, search, id) {
 
   $('.resultsPage').html(`
   <img class="hero-image" src="${responseJSON.data.results[0].thumbnail.path}/portrait_uncanny.${responseJSON.data.results[0].thumbnail.extension}">
-  <p class="character-description">${responseJSON.data.results[0].description}</p>
-  <a href="${responseJSON.data.results[0].urls[0].url}">Learn More</a>
-  <a href="${responseJSON.data.results[0].urls[2].url}">Comics</a>
+  <div class="info-container">
+    <p class="character-description">${responseJSON.data.results[0].description}</p>
+    <div class="link-container">
+      <a href="${responseJSON.data.results[0].urls[0].url}">Learn More</a>
+      <a href="${responseJSON.data.results[0].urls[2].url}">Comics</a>
+    </div>
+  </div>
   `)
 
 
@@ -295,7 +295,7 @@ function displayResults(responseJSON, search, id) {
       $('.loading-icon').removeClass('hidden');
       currentPage = newPage;
       getResults(search, id, currentPage)
-    } 
+    }
   })
   $('.next').on('click', function() {
     currentPage = currentPage + 1;
@@ -313,7 +313,6 @@ function getResultsName(name) {
   let endpoint = "/v1/public/characters";
   let url = getURL("name", endpoint, name);
   $('.pics').empty();
-  console.log(url);
 
   fetch(url)
     .then(response => {
@@ -324,7 +323,7 @@ function getResultsName(name) {
     })
     .then(responseJSON => displayResults(responseJSON))
     .catch(err => {
-      $('.errorMessage').text(`Something went wrong: ${err.message}`)
+      alert(`Something went wrong: name not found!`)
       $('.loading-icon').addClass('hidden')
     })
 }
@@ -335,11 +334,9 @@ function getOffset(page) {
 }
 
 function getResults(search, id, currentPage) {
-  // $('.loading-icon').removeClass('hidden')
   const eventId = id.toString();
   let endpoint = "/v1/public/characters";
   let url = getURL(search, endpoint, eventId);
-  console.log(url)
 
   fetch(`${url}&limit=10&offset=${getOffset(currentPage)}`)
     .then(response => response.json())
@@ -352,7 +349,6 @@ function getEventId(ref) {
   let endpoint = "/v1/public/events";
   let url = getURL(q, endpoint, ref)
   $('.errorMessage').empty();
-  console.log(url);
 
   fetch(url)
     .then(response => {
@@ -363,7 +359,7 @@ function getEventId(ref) {
     })
     .then(responseJSON => getResults(search, responseJSON.data.results[0].id, 1))
     .catch(err => {
-      $('.errorMessage').text(`Something went wrong: ${ref} not found!`)
+      alert(`Something went wrong: event not found!`)
       $('.loading-icon').addClass('hidden')
     })
 
@@ -374,7 +370,6 @@ function getComicId(ref) {
   let search = 'comics';
   let endpoint = "/v1/public/comics";
   let url = getURL(q, endpoint, ref)
-  console.log(url);
   $('.errorMessage').empty();
 
   fetch(url)
@@ -386,45 +381,60 @@ function getComicId(ref) {
     })
     .then(responseJSON => getResults(search, responseJSON.data.results[0].id, 1))
     .catch(err => {
-      $('.errorMessage').text(`Something went wrong: ${err.message}`)
+      alert(`Something went wrong: comic not found!`)
       $('.loading-icon').addClass('hidden')
     })
-  
-  
+}
+
+function callAPI(x) {
+  let w = window.location.href.split('/')
+    w = w.pop();
+    if (w === 'by-name.html') {
+      getResultsName(x);
+    } else if (w === 'by-event.html') {
+      getEventId(x);
+    } else {
+      getComicId(x);
+    }
+}
+
+function emptyThings() {
+  $('.errorMessage').empty();
+  $('.loading-icon').removeClass('hidden')
+  $('.pics').empty();
+  $('.page-nav').empty();
+}
+
+function attachSubmitListener(formName) {
+  $(formName).on("submit", event => {
+    event.preventDefault();
+    emptyThings();
+    let x = $('.searchBox').val();
+    if (x !== undefined && x !== "") {
+      callAPI(x);
+    }
+  })
+}
+
+function hamburgerMenu() {
+  $('.hamburger').on('click', function() {
+    $('.navbar').toggleClass('hidden')
+  });
 }
 
 function watchForm() {
-  $('.byName').on("submit", event => {
-    event.preventDefault();
-    $('.loading-icon').removeClass('hidden')
-    $('.pics').empty();
-    $('.page-nav').empty();
-    const name = $('.name').val();
-    getResultsName(name);
-  })
-  $('.byEvent').on("submit", event => {
-    event.preventDefault();
-    $('.loading-icon').removeClass('hidden')
-    $('.pics').empty();
-    $('.page-nav').empty();
-    const events = $('.event').val();
-    getEventId(events);
-  })
-  $('.byComic').on("submit", event => {
-    event.preventDefault();
-    $('.loading-icon').removeClass('hidden')
-    $('.pics').empty();
-    $('.page-nav').empty();
-    const comic = $('.comic').val();
-    getComicId(comic);
-  })
+  attachSubmitListener('.byName');
+  attachSubmitListener('.byEvent');
+  attachSubmitListener('.byComic');
+  hamburgerMenu();
 }
-
-$(watchForm)
 
 function characterResults() {
   let foo = (window.location.href).split('?');
   let search = (foo[1].split('='))[1];
+  search = search.split('%20');
+  search = search.join(" ");
   getResultsName(search);
-
 }
+
+$(watchForm)

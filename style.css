@@ -45,7 +45,7 @@ body {
 .logo {
   display: inline-block;
   position: absolute;
-  width: 10%;
+  width: 126px;
 }
 
 .navbar {
@@ -61,10 +61,15 @@ body {
   text-decoration: none;
   color: white;
   transition: ease-in-out .2s;
+  font-size: 16px;
 }
 
 .nav:hover {
   background-color: #f76065
+}
+
+.hamburger {
+  display: none;
 }
 
 .searchButtons {
@@ -112,6 +117,7 @@ h1 {
   color: white;
   background-color: #ed1d24;
   border: 1px solid white;
+  border-radius: 6px;
 }
 
 footer {
@@ -121,11 +127,6 @@ footer {
   margin-top: 125px;
   margin-bottom: 0px;
 }
-
-
-
-
-
 
 .search {
   height: 100px;
@@ -183,12 +184,25 @@ input.submit {
   display: none;
 }
 
+.loading-icon {
+  margin-top: 50px;
+}
+
+#loader-1 {
+  size: 100px;
+}
+
+.errorMessage {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 20px;
+}
+
 .pics {
   padding: 0px;
   margin-top: 20px;
 }
-
-
 
 .content-wrapper {
   display: flex;
@@ -230,17 +244,9 @@ input.submit {
   margin-left: 20%;
 }
 
-.prev {
-  /* margin-right: 5px; */
-}
-
 .page-item {
   padding: 5px;
   border: 1px solid rgb(219, 219, 219);
-}
-
-.next {
-  /* margin-left: 5px; */
 }
 
 .page-item:hover {
@@ -250,5 +256,104 @@ input.submit {
 
 .prev:hover, .next:hover {
   cursor: pointer;
+}
+
+.resultsPage {
+  display: flex;
+  justify-content: space-evenly;
+  margin-top: 100px;
+  width: 60%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.info-container {
+  margin-left: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.link-container {
+  margin-top: 30px;
+}
+
+.info-container > p {
+  line-height: 23px;
+}
+
+.info-container > p::first-letter {
+  font-size: 250%;
+}
+
+.info-container > p:first-letter {
+  initial-letter: 4;
+}
+
+.link-container > a {
+  margin-right: 25px;
+  text-decoration: underline;
+  color: black;
+  font-size: 18px;
+}
+
+.link-container > a:hover {
+  color: rgb(83, 83, 83);
+}
+
+
+
+
+
+@media screen and (max-width: 900px) {
+
+  .button-container {
+    margin-top: 30px;
+    flex-direction: column;
+  }
+
+  .button {
+    margin-bottom: 10px;
+    width: 100%;
+  }
+
+  .line {
+    border: 1px solid white;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    width: 25px;
+  }
+
+  .burger-container {
+    display: flex;
+    width: 100%;
+    justify-content: flex-end;
+    height: 52px;
+  }
+
+  .hamburger  {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 1px;
+  }
+
+  .hamburger:hover, .hamburger:focus {
+    background-color: #f76065;
+    cursor: pointer;
+  }
+
+  .navbar {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+    margin-right: 0px;
+  }
   
+  .hidden {
+    display: none;
+  }
+
 }
