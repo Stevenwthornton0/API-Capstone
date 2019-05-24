@@ -40,6 +40,7 @@ body {
   display: block;
   padding: 0px;
   margin: 0px;
+  height: 52px;
 }
 
 .logo {
@@ -230,7 +231,7 @@ input.submit {
 .character-link {
   text-decoration: none;
   color: black;
-  padding: 30px;
+  padding: 60px;
 }
 
 .character-name {
@@ -305,6 +306,9 @@ input.submit {
 
 
 
+
+
+
 @media screen and (max-width: 900px) {
 
   .button-container {
@@ -345,15 +349,64 @@ input.submit {
     cursor: pointer;
   }
 
+  .navbar-container {
+    display: flex;
+    justify-content: flex-end;
+    background-color: white;
+  }
+
   .navbar {
     display: flex;
     flex-direction: column;
     width: 50%;
-    margin-right: 0px;
+    padding-left: 0;
+    background-color: #ed1d24;
+    z-index: 5;
+  }
+
+  .navbar > li {
+    display: flex;
+    justify-content: center;
+    line-height: 25px;
+  }
+
+  .navbar > li:hover, .navbar > li:focus {
+    cursor: pointer;
+  }
+
+  .navbar > li > a {
+    width: 100%;
+    text-align: center;
   }
   
-  .hidden {
+  .smallScreen {
     display: none;
+  }
+
+  .nav {
+    font-size: 19px;
+  }
+
+  .content-wrapper {
+    width: 90%;
+  }
+
+  .resultsPage {
+    display: flex;
+    flex-direction: column;
+    margin-top: 50px;
+  }
+
+  .hero-image {
+    margin-bottom: 35px;
+  }
+
+  .info-container {
+    margin-left: 0px;
+  }
+
+  footer {
+    margin-top: 50px;
   }
 
 }

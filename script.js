@@ -418,7 +418,7 @@ function attachSubmitListener(formName) {
 
 function hamburgerMenu() {
   $('.hamburger').on('click', function() {
-    $('.navbar').toggleClass('hidden')
+    $('.navbar').toggleClass('smallScreen')
   });
 }
 
