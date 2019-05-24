@@ -398,7 +398,9 @@ input.submit {
   }
 
   .hero-image {
+    width: 80%;
     margin-bottom: 35px;
+    align-self: center;
   }
 
   .info-container {
